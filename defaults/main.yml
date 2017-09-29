@@ -1,0 +1,36 @@
+
+#
+#  Defaults for guest:
+
+size:   1g           # disk size
+memory: 512m         
+cpu:    1
+lvm:    rootvg
+method: debootstrap
+dist:   xenial
+
+#
+#  Defaults for overwrite/force if guest already exists or did exist before
+
+overwrite: false
+force:  ""           # is automatically set to --force if overwrite == true
+
+#
+#  Default group to new guests to
+
+xen_group: xen_guests
+
+#
+#  Default domain new hosts end up as
+
+domain: ".lan"   # should be prefixed with a '.'
+
+#
+#  Default operational values, can be changed if needed
+
+xen_etc_dir:      /etc/xen                      # the directory where guest config files are stored on the Xen server
+xen_skeleton_dir: /etc/xen-tools/skel/root      # the directory where skeleton files are placed on the Xen server
+
+connect_retry:   2    # the time to pause in between attempts to connect to a new guest
+connect_timeout: 60   # the time to wait until a new guest comes online
+

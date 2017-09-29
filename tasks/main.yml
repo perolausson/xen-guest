@@ -1,0 +1,123 @@
+
+- set_fact:
+    guest_name: "{{name+domain}}"
+
+- fail: msg="A name for the new guest must be defined"
+  when: guest_name is undefined
+
+- name: Create Xen skeleton directory for .ssh files
+  file:
+    path: "{{xen_skeleton_dir}}/.ssh"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  become: true
+
+- name: Create authorized_keys file in skeleton directory
+  copy:
+    src: ~/.ssh/id_rsa.pub
+    dest: "{{xen_skeleton_dir}}/.ssh/authorized_keys"
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+  
+- name: Check if the guest already exists
+  command: xl list "{{ guest_name }}"
+  register: guest_exists
+  ignore_errors: true
+  become: true
+
+- fail: msg="A guest called {{ guest_name }} already exists and overwrite is set to false or not defined"
+  when:
+    - overwrite is undefined or not overwrite
+    - guest_exists.rc == 0
+
+- name: Destroy an existing guest if exists and overwrite is true
+  command: xl destroy "{{ guest_name }}"
+  when:
+    - overwrite is defined and overwrite == true
+    - guest_exists.rc == 0
+  become: true
+
+- name: Remove any existing configuration file for the guest
+  file:
+    path: "{{xen_etc_dir}}/{{ guest_name }}.cfg"
+    state: absent
+  become: true
+
+- set_fact:
+    force: "--force"
+  when: overwrite
+
+- name: Create a new Xen guest image
+  command: >
+    xen-create-image --hostname="{{guest_name}}"
+    --size={{size}} --memory={{memory}} --vcpus={{cpu}} --lvm={{lvm}} --dhcp 
+    --pygrub --install-method={{method}} --dist={{dist}} {{force}}
+  register: xen
+  become: true
+
+- set_fact:
+    xen_output: "{{xen.stdout}}"     #  Workaround bug in quote filter
+
+- name: Grab password
+  local_action: shell echo {{ xen_output | quote }} | grep -i "^root password" | cut -d{{':'}} -f2 
+  register: guest_password
+
+- debug: msg="Guest root password is {{guest_password.stdout | trim}}"
+
+- name: Create the guest
+  command: xl create "/etc/xen/{{guest_name}}.cfg"
+  become: true
+
+- name: Wait for guest to come online
+  wait_for:
+    host: "{{guest}}"
+    connect_timeout: "{{connect_retry}}"
+    timeout: "{{connect_timeout}}"
+
+- name: Lookup IP address of guest
+  set_fact:
+    name_ip: "{{ lookup('dig', guest_name )}}"   # short name lookups usually don't work any more due to security concerns
+
+- name: Remove old SSH fingerprint for short hostname
+  known_hosts:
+    name: "{{ name }}"
+    state: absent
+  when: overwrite
+
+- name: Remove old SSH fingerprint for long hostname
+  known_hosts:
+    name: "{{ guest_name }}"
+    state: absent
+  when: overwrite and guest_name != name
+
+- name: Remove old SSH fingerprint for IP
+  known_hosts:
+    name: "{{ name_ip }}"
+    state: absent
+  when: overwrite
+  
+- name: Add new SSH fingerprint for short hostname
+  local_action: shell ssh-keyscan "{{ name }}" >> ~/.ssh/known_hosts
+
+- name: Add new SSH fingerprint for long hostname
+  local_action: shell ssh-keyscan "{{ guest_name }}" >> ~/.ssh/known_hosts
+  when: guest_name != name
+
+
+- name: Add new SSH fingerprint for IP
+  local_action: shell ssh-keyscan "{{ name_ip }}" >> ~/.ssh/known_hosts
+
+- name: Add host to inventory
+  add_host:
+    name: "{{ guest_name }}"
+    groups: "{{ xen_group }}"
+    ansible_user: root
+    #ansible_password: "{{guest_password.stdout | trim}}"
+
+- name: Prepare host for Ansible
+  local_action: command ansible "{{ guest_name }}" -i "{{ guest_name }}," -u root -m raw -a "apt -o Acquire::ForceIPv4=true update && apt -o Acquire::ForceIPv4=true install -y python-minimal"
+  when: method == "debootstrap"
