@@ -36,21 +36,21 @@ There is a DHCP server which also updates DNS with any new hosts
 Role Variables
 --------------
 
-  Variable	Default		Description  
-  ==============	======		========================================
-  size 		1g 		the disk size the new guest should have
-  memory 		512m		the amount of memory ...
-  cpu		1		the number of virtual cpus ...
-  lvm		rootvg		the name of the volume group on the hypervisor that filesystems should be created from
-  method		debootstrap	the method used ("debootstrap" for ubuntu, "rinse" for rpm based)
-  dist            xenial          Ubuntu Xenial
-  overwrite	false		overwrite and replace an existing guest with the same name
-  domain		.lan		the name of the domain that new guests should be a member of
+    Variable	Default		Description  
+    ==============	======		========================================
+    size 		1g 		the disk size the new guest should have
+    memory 		512m		the amount of memory ...
+    cpu		1		the number of virtual cpus ...
+    lvm		rootvg		the name of the volume group on the hypervisor that filesystems should be created from
+    method		debootstrap	the method used ("debootstrap" for ubuntu, "rinse" for rpm based)
+    dist            xenial          Ubuntu Xenial
+    overwrite	false		overwrite and replace an existing guest with the same name
+    domain		.lan		the name of the domain that new guests should be a member of
   
 The following should be changed if you have non-standard locations for Xen:
   
-  xen_etc_dir	    /etc/xen	       	      Where guest config files are to be created
-  xen_skeleton_dir  /etc/xen-tools/skel/root  The directory where skeleton files are placed for the root user
+    xen_etc_dir	    /etc/xen	       	      Where guest config files are to be created
+    xen_skeleton_dir  /etc/xen-tools/skel/root  The directory where skeleton files are placed for the root user
 
 Dependencies
 ------------
@@ -59,56 +59,56 @@ None
 
 Example Playbook for creating a Xenial guest and install apache on it
 ---------------------------------------------------------------------
-
- ---
-  - hosts: forester   # change this to the host where your Xen hypervisor is running
-    roles:
-      - role: xen-guest
-        name: zeus2
-        overwrite: true
+    
+     ---
+      - hosts: forester   # change this to the host where your Xen hypervisor is running
+        roles:
+          - role: xen-guest
+            name: zeus2
+            overwrite: true
    
-  - hosts: zeus2.lan
-    tasks:
+      - hosts: zeus2.lan
+        tasks:
 
-      - name: Ping the new guest
-        ping:
+          - name: Ping the new guest
+            ping:
 
-      - name: Setup
-        setup: filter=ansible_eth[0-2]
+          - name: Setup
+            setup: filter=ansible_eth[0-2]
 
-      - name: Install Apache2
-        package:
-          name: apache2
-          state: latest
+          - name: Install Apache2
+            package:
+              name: apache2
+              state: latest
 
 Abbreviated example run:
 
-TASK [xen-guest : debug] **************************************************************************************************************************************************************
-ok: [forester] => {
-    "msg": "Guest root password is 2S4rgXtANh5bv2MUv96Cmnu"
-}
-....
+    TASK [xen-guest : debug] **************************************************************************************************************************************************************
+    ok: [forester] => {
+        "msg": "Guest root password is 2S4rgXtANh5bv2MUv96Cmnu"
+    }
+    ....
 
-TASK [xen-guest : Prepare host for Ansible] *******************************************************************************************************************************************
-changed: [forester -> localhost]
+    TASK [xen-guest : Prepare host for Ansible] *******************************************************************************************************************************************
+    changed: [forester -> localhost]
+    
+    PLAY [zeus2.lan] **********************************************************************************************************************************************************************
+    
+    TASK [Gathering Facts] ****************************************************************************************************************************************************************
+    ok: [zeus2.lan]
 
-PLAY [zeus2.lan] **********************************************************************************************************************************************************************
+    TASK [Ping the new guest] *************************************************************************************************************************************************************
+    ok: [zeus2.lan]
 
-TASK [Gathering Facts] ****************************************************************************************************************************************************************
-ok: [zeus2.lan]
+    TASK [Setup] **************************************************************************************************************************************************************************
+    ok: [zeus2.lan]
 
-TASK [Ping the new guest] *************************************************************************************************************************************************************
-ok: [zeus2.lan]
+    TASK [Install Apache2] ****************************************************************************************************************************************************************
+    changed: [zeus2.lan]
 
-TASK [Setup] **************************************************************************************************************************************************************************
-ok: [zeus2.lan]
-
-TASK [Install Apache2] ****************************************************************************************************************************************************************
-changed: [zeus2.lan]
-
-PLAY RECAP ****************************************************************************************************************************************************************************
-forester                   : ok=22   changed=10   unreachable=0    failed=0   
-zeus2.lan                  : ok=4    changed=1    unreachable=0    failed=0  
+    PLAY RECAP ****************************************************************************************************************************************************************************
+    forester                   : ok=22   changed=10   unreachable=0    failed=0   
+    zeus2.lan                  : ok=4    changed=1    unreachable=0    failed=0  
 
 License
 -------
