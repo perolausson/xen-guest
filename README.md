@@ -67,8 +67,8 @@ Role Variables
   
 The following should be changed if you have non-standard locations for Xen:
   
-    xen_etc_dir	    /etc/xen	       	      Where guest config files are to be created
-    xen_skeleton_dir  /etc/xen-tools/skel/root  The directory where skeleton files are placed for the root user
+    xen_etc_dir	      /etc/xen	       	        Where guest config files are to be created
+    xen_skeleton_dir  /etc/xen-tools/skel/root  Where skeleton files are placed for the root user
 
 
 Example Playbook for creating a Xenial guest and install apache on it
@@ -132,4 +132,4 @@ BSD
 Author Information
 ------------------
 
-Per Olausson. No warranties given or implied.
+Per Olausson. No warranties implied or given.
