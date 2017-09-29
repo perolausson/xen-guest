@@ -1,6 +1,6 @@
 galaxy_info:
   author: Per Olausson
-  description: Ansible role for creating xen-guests on the fly
+  description: Create xen-guests on the fly and play with
   company: Caxa Limited
 
   license: BSD
@@ -15,6 +15,6 @@ galaxy_info:
 
   galaxy_tags:
     - xen
-    - xen_hypervisor
+    - hypervisor
 
 dependencies: []
