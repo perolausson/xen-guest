@@ -3,9 +3,33 @@ xen-guest
 
 This is a role for creating guests on a Xen hypervisor which can then immediately be used to perform Ansible actions on, in the same Ansible playbook run.
 
-The role uses xen-tools/xen-create-image to create new guests and it is possible to specify the method used.
+Requirements
+------------
 
-This means you can install debian/ubuntu or centos/fedora guests but the latter is dependent on support in xen-tools. Unfortunately the latest centos support is centos-6.
+* Ansible dig (dnspython from pip and dig from your distribution; Ansible 1.9+)
+
+Tested on
+---------
+
+* Ubuntu 17.04
+* Ansible 2.4
+* Xen Hypervisor 4.8
+* Xen-tools 4.7-1
+
+Dependencies
+------------
+
+* A working Xen hypervisor installation with xen-tools installed
+* There is a DHCP server which also updates DNS with any new hosts
+
+Description
+-----------
+
+The role uses xen-tools/xen-create-image to create new guests.
+
+The method of installation can be specified, which means that is possible to install debian/ubuntu or centos/fedora guests but the latter is dependent on support in xen-tools.
+
+Unfortunately the latest centos support in Xen-tools is centos-6.
 
 There are issues to be aware of which has not been solved, such as feature levels in filesystems you create are dependent on the feature levels in your hypervisor.
 
@@ -26,12 +50,6 @@ TODO:
 
 * Add permanent inventory updates, currently only in-memory updates are done after the new guest has been prepared for Ansible use.
 
-Requirements
-------------
-
-Ansible dig (dnspython from pip and dig from your distribution; Ansible 1.9+)
-A working Xen hypervisor installation with xen-tools installed
-There is a DHCP server which also updates DNS with any new hosts
 
 Role Variables
 --------------
@@ -52,10 +70,6 @@ The following should be changed if you have non-standard locations for Xen:
     xen_etc_dir	    /etc/xen	       	      Where guest config files are to be created
     xen_skeleton_dir  /etc/xen-tools/skel/root  The directory where skeleton files are placed for the root user
 
-Dependencies
-------------
-
-None
 
 Example Playbook for creating a Xenial guest and install apache on it
 ---------------------------------------------------------------------
