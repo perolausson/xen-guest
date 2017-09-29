@@ -10,10 +10,11 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - 17.04
+        - xenial
+        - zesty
 
   galaxy_tags:
-    xen
-    xen-hypervisor
+    - xen
+    - xen-hypervisor
 
 dependencies: []
