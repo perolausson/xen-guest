@@ -1,0 +1,21 @@
+---
+
+ - hosts: forester
+   roles:
+     - role: xen-guest
+       name: "{{ guest }}"
+       overwrite: true
+   
+ - hosts: "{{ guest }}.lan"
+   tasks:
+
+     - name: Ping the new guest
+       ping:
+
+     - name: Setup
+       setup: filter=ansible_eth[0-2]
+
+     - name: Install Apache2
+       package:
+         name: apache2
+         state: latest
