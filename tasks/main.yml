@@ -51,11 +51,15 @@
     force: "--force"
   when: overwrite
 
+- set_fact:
+    filesystem: "--fs={{fs}}"
+  when: fs != ""
+
 - name: Create a new Xen guest image
   command: >
     xen-create-image --hostname="{{guest_name}}"
     --size={{size}} --memory={{memory}} --vcpus={{cpu}} --lvm={{lvm}} --dhcp 
-    --pygrub --install-method={{method}} --dist={{dist}} {{force}}
+    --pygrub --install-method={{method}} --dist={{dist}} {{filesystem}} {{force}}
   register: xen
   become: true
 

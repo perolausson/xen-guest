@@ -46,11 +46,6 @@ What happens when you run through the role?
  - add the guest to the in-memory inventory
  - prepare the host for Ansible operations (install python-minimal)
 
-TODO:
-
-* Add permanent inventory updates, currently only in-memory updates are done after the new guest has been prepared for Ansible use.
-
-
 Role Variables
 --------------
 
@@ -67,7 +62,7 @@ Role Variables
   
 The following should be changed if you have non-standard locations for Xen:
   
-    xen_etc_dir	      /etc/xen	       	        Where guest config files are to be created
+    xen_etc_dir	  /etc/xen	       	    Where guest config files are to be created
     xen_skeleton_dir  /etc/xen-tools/skel/root  Where skeleton files are placed for the root user
 
 
@@ -123,6 +118,11 @@ Abbreviated example run:
     PLAY RECAP ****************************************************************************************************************************************************************************
     forester                   : ok=22   changed=10   unreachable=0    failed=0   
     zeus2.lan                  : ok=4    changed=1    unreachable=0    failed=0  
+
+TODO:
+-----
+
+* Add permanent inventory updates, currently only in-memory updates are done after the new guest has been prepared for Ansible use.
 
 License
 -------

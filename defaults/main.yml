@@ -8,6 +8,7 @@ cpu:    1
 lvm:    rootvg
 method: debootstrap
 dist:   xenial
+fs:     ""
 
 #
 #  Defaults for overwrite/force if guest already exists or did exist before
